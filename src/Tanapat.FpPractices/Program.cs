@@ -1,4 +1,5 @@
 ﻿using static Tanapat.FpPractices.Features.EMVQR;
+using static Tanapat.FpPractices.Features.DBMethods;
 
 var sample = "0002010102112632002816728000581200000000100000055204581253031445502015802LK5909Vits Food6007Colombo61050080062580032537c0a88562e4a599cab63d1992f0dac05181600766683296-000563042AB7";
 
@@ -6,6 +7,7 @@ var buildResult =
         from blocks in CutQr(sample)
         from text in BuildOutput(blocks)
         from html in BuildHtmlOutput(blocks)
+        from _ in FindUserByEmail("test@x.cox")
         select (text, html);
 
 buildResult.Match(
