@@ -60,6 +60,8 @@ public static class EMVQR
         return Try(() => {
             var builder = new StringBuilder();
 
+            builder.AppendLine("<html>");
+
             builder.AppendLine(@"<style type=""text/css""> .qr-tag { color: blue } .qr-len { color: red} .qr-value { color: black } </style>");
 
             builder.AppendLine("<pre>");
@@ -70,6 +72,8 @@ public static class EMVQR
             }
 
             builder.AppendLine("</pre>");
+
+            builder.AppendLine("</html");
 
             return builder.ToString();
         });

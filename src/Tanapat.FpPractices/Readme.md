@@ -52,19 +52,4 @@ Console.WriteLine("Press any key to continue");
 Console.Read();
 ```
 
-output:
-<style type="text/css"> .qr-tag { color: blue } .qr-len { color: red} .qr-value { color: black } </style>
-<pre>
-<text class='qr-tag'>00</text> <text class='qr-len'>02</text> <text class='qr-value'>01</text>
-<text class='qr-tag'>01</text> <text class='qr-len'>02</text> <text class='qr-value'>11</text>
-<text class='qr-tag'>26</text> <text class='qr-len'>32</text> <text class='qr-value'>00281672800058120000000010000005</text>
-<text class='qr-tag'>52</text> <text class='qr-len'>04</text> <text class='qr-value'>5812</text>
-<text class='qr-tag'>53</text> <text class='qr-len'>03</text> <text class='qr-value'>144</text>
-<text class='qr-tag'>55</text> <text class='qr-len'>02</text> <text class='qr-value'>01</text>
-<text class='qr-tag'>58</text> <text class='qr-len'>02</text> <text class='qr-value'>LK</text>
-<text class='qr-tag'>59</text> <text class='qr-len'>09</text> <text class='qr-value'>Vits Food</text>
-<text class='qr-tag'>60</text> <text class='qr-len'>07</text> <text class='qr-value'>Colombo</text>
-<text class='qr-tag'>61</text> <text class='qr-len'>05</text> <text class='qr-value'>00800</text>
-<text class='qr-tag'>62</text> <text class='qr-len'>58</text> <text class='qr-value'>0032537c0a88562e4a599cab63d1992f0dac05181600766683296-0005</text>
-<text class='qr-tag'>63</text> <text class='qr-len'>04</text> <text class='qr-value'>2AB7</text>
-</pre>
+[Output file](output.html)
