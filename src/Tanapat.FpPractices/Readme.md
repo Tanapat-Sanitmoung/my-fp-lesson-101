@@ -2,13 +2,16 @@
 code:
 ```C#
 using static Tanapat.FpPractices.Features.EMVQR;
+using static Tanapat.FpPractices.Features.DBMethods;
 
 var sample = "0002010102112632002816728000581200000000100000055204581253031445502015802LK5909Vits Food6007Colombo61050080062580032537c0a88562e4a599cab63d1992f0dac05181600766683296-000563042AB7";
 
 var buildResult = 
         from blocks in CutQr(sample)
         from text in BuildOutput(blocks)
-        select text;
+        from html in BuildHtmlOutput(blocks)
+        from _ in FindUserByEmail("test@x.cox") // see DB.cs
+        select (text, html);
 
 buildResult.Match(
     HandleSuccess,
@@ -18,9 +21,10 @@ buildResult.Match(
 Console.WriteLine("Press any key to continue");
 Console.Read();
 
-static void HandleSuccess(string output)
+static void HandleSuccess((string text, string html) output)
 {
-    Console.WriteLine($"success: {Environment.NewLine}{output}");
+    Console.WriteLine($"success: {Environment.NewLine}{output.text}");
+    Console.WriteLine($"success: {Environment.NewLine}{output.html}");
 }
 
 static void HandleFail(Exception ex)
@@ -32,19 +36,6 @@ static void HandleFail(Exception ex)
 output:
 ```console
 dotnet run
-success: 
-00 02 01
-01 02 11
-26 32 00281672800058120000000010000005
-52 04 5812
-53 03 144
-55 02 01
-58 02 LK
-59 09 Vits Food
-60 07 Colombo
-61 05 00800
-62 58 0032537c0a88562e4a599cab63d1992f0dac05181600766683296-0005
-63 04 2AB7
-
+error: Sequence contains no elements
 Press any key to continue
 ```
