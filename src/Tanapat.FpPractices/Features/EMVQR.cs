@@ -54,4 +54,24 @@ public static class EMVQR
             return builder.ToString();
         });
     }
+
+    public static Try<string> BuildHtmlOutput(string[] blocks)
+    {
+        return Try(() => {
+            var builder = new StringBuilder();
+
+            builder.AppendLine(@"<style type=""text/css""> .qr-tag { color: blue } .qr-len { color: red} .qr-value { color: black } </style>");
+
+            builder.AppendLine("<pre>");
+
+            for(int i = 0; i < blocks.Length; i += 3)
+            {
+                builder.AppendLine($"<text class='qr-tag'>{blocks[i]}</text> <text class='qr-len'>{blocks[i +1]}</text> <text class='qr-value'>{blocks[i +2]}</text>");
+            }
+
+            builder.AppendLine("</pre>");
+
+            return builder.ToString();
+        });
+    }
 }
