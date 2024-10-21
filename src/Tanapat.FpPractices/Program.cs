@@ -5,7 +5,8 @@ var sample = "000201010211263200281672800058120000000010000005520458125303144550
 var buildResult = 
         from blocks in CutQr(sample)
         from text in BuildOutput(blocks)
-        select text;
+        from html in BuildHtmlOutput(blocks)
+        select (text, html);
 
 buildResult.Match(
     HandleSuccess,
@@ -15,9 +16,10 @@ buildResult.Match(
 Console.WriteLine("Press any key to continue");
 Console.Read();
 
-static void HandleSuccess(string output)
+static void HandleSuccess((string text, string html) output)
 {
-    Console.WriteLine($"success: {Environment.NewLine}{output}");
+    Console.WriteLine($"success: {Environment.NewLine}{output.text}");
+    Console.WriteLine($"success: {Environment.NewLine}{output.html}");
 }
 
 static void HandleFail(Exception ex)
