@@ -7,9 +7,10 @@ namespace Tanapat.FpPractices.Features;
 public static class EMVQR
 {
         
-    public static Try<string[]> CutQr(string data)
+    public static Either<Exception, Seq<string>> CutQr(string data)
     {
-        return Try(() => {
+        try 
+        {
             var blocks = new List<string>();
 
             var index = 0;
@@ -37,13 +38,17 @@ public static class EMVQR
                 blocks.AddRange([tag, lenStr, value]);
             }
 
-            return blocks.ToArray();
-        });
+            return Right<Exception, Seq<string>>(blocks.ToSeq());
+        }
+        catch(Exception ex)
+        {
+            return Left<Exception, Seq<string>>(ex);
+        }
     }
 
-    public static Try<string> BuildOutput(string[] blocks)
+    public static Either<Exception, string> BuildOutput(Seq<string> blocks)
     {
-        return Try(() => {
+        try {
             var builder = new StringBuilder();
 
             for(int i = 0; i < blocks.Length; i += 3)
@@ -51,13 +56,18 @@ public static class EMVQR
                 builder.AppendLine($"{blocks[i]} {blocks[i +1]} {blocks[i +2]}");
             }
 
-            return builder.ToString();
-        });
+            return Right<Exception, string>(builder.ToString());
+        }
+        catch(Exception ex)
+        {
+            return Left<Exception, string>(ex);
+        }
     }
 
-    public static Try<string> BuildHtmlOutput(string[] blocks)
+    public static Either<Exception, string> BuildHtmlOutput(Seq<string> blocks)
     {
-        return Try(() => {
+        try 
+        {
             var builder = new StringBuilder();
 
             builder.AppendLine("<html>");
@@ -75,7 +85,11 @@ public static class EMVQR
 
             builder.AppendLine("</html");
 
-            return builder.ToString();
-        });
+            return Right<Exception, string>(builder.ToString());
+        }
+        catch (Exception ex)
+        {
+            return Left<Exception, string>(ex);
+        }
     }
 }
