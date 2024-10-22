@@ -2,7 +2,6 @@ using LanguageExt;
 using static LanguageExt.Prelude;
 
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
 
 namespace Tanapat.FpPractices.Features;
 
@@ -29,19 +28,21 @@ public class DB : DbContext
 
 public static class DBMethods
 {
-    private static Either<Exception, DB> GetDB() 
+    private static Either<ProblemDetail, DB> GetDB() 
     {
         try
         {
-            return Right<Exception, DB>(new DB());
+            return Right<ProblemDetail, DB>(new DB());
         }
         catch (Exception ex)
         {
-            return Left<Exception, DB>(ex);
+            return Left<ProblemDetail, DB>(
+                new ProblemDetail(nameof(GetDB) + "-2410220707", "001", "Failed to create DB")
+            );
         }
     }
 
-    private static Either<Exception, User> FindByEmail(DB db, string email)
+    private static Either<ProblemDetail, User> FindByEmail(DB db, string email)
     {
         try
         {
@@ -49,15 +50,17 @@ public static class DBMethods
                 .Where(u => u.Email == email)
                 .Single();
 
-            return Right<Exception, User>(user);
+            return Right<ProblemDetail, User>(user);
         }
         catch (Exception ex)
         {
-            return Left<Exception, User>(ex);
+            return Left<ProblemDetail, User>(
+                new ProblemDetail(nameof(FindByEmail) + "-2410220708", "002", "Failed to get user")
+            );
         }
     }
 
-    public static Either<Exception, User> FindUserByEmail(string email) => 
+    public static Either<ProblemDetail, User> FindUserByEmail(string email) => 
         from db in GetDB()
         from user in FindByEmail(db, email)
         select user;

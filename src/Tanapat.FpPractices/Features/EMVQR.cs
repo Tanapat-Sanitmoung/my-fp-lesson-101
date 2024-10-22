@@ -7,7 +7,7 @@ namespace Tanapat.FpPractices.Features;
 public static class EMVQR
 {
         
-    public static Either<Exception, Seq<string>> CutQr(string data)
+    public static Either<ProblemDetail, Seq<string>> CutQr(string data)
     {
         try 
         {
@@ -38,15 +38,17 @@ public static class EMVQR
                 blocks.AddRange([tag, lenStr, value]);
             }
 
-            return Right<Exception, Seq<string>>(blocks.ToSeq());
+            return Right<ProblemDetail, Seq<string>>(blocks.ToSeq());
         }
         catch(Exception ex)
         {
-            return Left<Exception, Seq<string>>(ex);
+            return Left<ProblemDetail, Seq<string>>(
+                new ProblemDetail($"{nameof(CutQr)}-241010", "001", ex.Message)
+            );
         }
     }
 
-    public static Either<Exception, string> BuildOutput(Seq<string> blocks)
+    public static Either<ProblemDetail, string> BuildOutput(Seq<string> blocks)
     {
         try {
             var builder = new StringBuilder();
@@ -56,15 +58,17 @@ public static class EMVQR
                 builder.AppendLine($"{blocks[i]} {blocks[i +1]} {blocks[i +2]}");
             }
 
-            return Right<Exception, string>(builder.ToString());
+            return Right<ProblemDetail, string>(builder.ToString());
         }
         catch(Exception ex)
         {
-            return Left<Exception, string>(ex);
+            return Left<ProblemDetail, string>(
+                new ProblemDetail($"{nameof(BuildOutput)}-241010", "002", ex.Message)
+            );
         }
     }
 
-    public static Either<Exception, string> BuildHtmlOutput(Seq<string> blocks)
+    public static Either<ProblemDetail, string> BuildHtmlOutput(Seq<string> blocks)
     {
         try 
         {
@@ -85,11 +89,13 @@ public static class EMVQR
 
             builder.AppendLine("</html");
 
-            return Right<Exception, string>(builder.ToString());
+            return Right<ProblemDetail, string>(builder.ToString());
         }
         catch (Exception ex)
         {
-            return Left<Exception, string>(ex);
+             return Left<ProblemDetail, string>(
+                new ProblemDetail($"{nameof(BuildHtmlOutput)}-241010", "003", ex.Message)
+            );
         }
     }
 }
