@@ -1,17 +1,45 @@
 using System.Text;
 using LanguageExt;
+using SkiaSharp;
+using ZXing.SkiaSharp;
 using static LanguageExt.Prelude;
 
 namespace Tanapat.FpPractices.Features;
 
+public record Problem(string Message);
+public record QrBlock(string Tag, string Len, string Value);
+
 public static class EMVQR
 {
-        
-    public static Either<Exception, Seq<string>> CutQr(string data)
+    public static Either<Problem, string> ReadFromImage(string file)
+    {
+        try
+        {
+            using var stream = File.OpenRead(file);
+            using var bitmap = SKBitmap.Decode(stream);
+
+            var reader = new BarcodeReader();
+            var decodeResult = reader.Decode(bitmap);
+
+            if (decodeResult == null)
+            {
+                return new Problem("Could not decode input file");
+            }
+
+            return decodeResult.Text;
+
+        }
+        catch (Exception ex)
+        {
+            return new Problem(ex.Message);
+        }
+    }
+
+    public static Either<Problem, Seq<QrBlock>> CutQr(string data)
     {
         try 
         {
-            var blocks = new List<string>();
+            var blocks = new List<QrBlock>();
 
             var index = 0;
             var lastIndex = data.Length;
@@ -35,61 +63,62 @@ public static class EMVQR
 
                 index += len;
 
-                blocks.AddRange([tag, lenStr, value]);
+                blocks.Add(new QrBlock(tag, lenStr, value));
             }
 
-            return Right<Exception, Seq<string>>(blocks.ToSeq());
+            return blocks.ToSeq();
         }
         catch(Exception ex)
         {
-            return Left<Exception, Seq<string>>(ex);
+            return new Problem($"{nameof(CutQr)} failed:= {ex.Message}");
         }
     }
 
-    public static Either<Exception, string> BuildOutput(Seq<string> blocks)
+    public static Either<Problem, string> BuildOutput(
+        Seq<QrBlock> blocks, 
+        Action<StringBuilder, QrBlock>? before = null,
+        Action<StringBuilder, QrBlock>? after = null)
     {
         try {
             var builder = new StringBuilder();
 
-            for(int i = 0; i < blocks.Length; i += 3)
+            foreach(var b in blocks)
             {
-                builder.AppendLine($"{blocks[i]} {blocks[i +1]} {blocks[i +2]}");
+                before?.Invoke(builder, b);
+
+                builder.AppendLine($"{b.Tag} {b.Len} {b.Value}");
+
+                after?.Invoke(builder, b);
             }
 
-            return Right<Exception, string>(builder.ToString());
+            return builder.ToString();
         }
         catch(Exception ex)
         {
-            return Left<Exception, string>(ex);
+            return new Problem($"{nameof(BuildOutput)} failed:= {ex.Message}");
         }
     }
 
-    public static Either<Exception, string> BuildHtmlOutput(Seq<string> blocks)
+    public static void AddMainTagComment(
+        StringBuilder builder,
+        QrBlock qrBlock
+    )
     {
-        try 
+        try
         {
-            var builder = new StringBuilder();
-
-            builder.AppendLine("<html>");
-
-            builder.AppendLine(@"<style type=""text/css""> .qr-tag { color: blue } .qr-len { color: red} .qr-value { color: black } </style>");
-
-            builder.AppendLine("<pre>");
-
-            for(int i = 0; i < blocks.Length; i += 3)
+            if(qrBlock.Tag == "01")
             {
-                builder.AppendLine($"<text class='qr-tag'>{blocks[i]}</text> <text class='qr-len'>{blocks[i +1]}</text> <text class='qr-value'>{blocks[i +2]}</text>");
+                _ = qrBlock.Value switch
+                {
+                    "11" => builder.AppendLine("//Dynamic QR"),
+                    "12" => builder.AppendLine("//Static QR"),
+                    _ => default
+                };
             }
-
-            builder.AppendLine("</pre>");
-
-            builder.AppendLine("</html");
-
-            return Right<Exception, string>(builder.ToString());
         }
-        catch (Exception ex)
+        catch
         {
-            return Left<Exception, string>(ex);
+            //ignore error
         }
     }
 }

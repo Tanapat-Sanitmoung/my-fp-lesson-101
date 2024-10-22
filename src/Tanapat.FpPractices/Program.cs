@@ -1,28 +1,33 @@
-﻿using static Tanapat.FpPractices.Features.EMVQR;
-
-var sample = "0002010102112632002816728000581200000000100000055204581253031445502015802LK5909Vits Food6007Colombo61050080062580032537c0a88562e4a599cab63d1992f0dac05181600766683296-000563042AB7";
+﻿using LanguageExt;
+using Tanapat.FpPractices.Features;
+using static Tanapat.FpPractices.Features.EMVQR;
 
 var buildResult = 
-        from blocks in CutQr(sample)
-        from text in BuildOutput(blocks)
-        from html in BuildHtmlOutput(blocks)
-        select (text, html);
+    from qrCode in ReadFromImage("qr.png")
+    from _1 in Obeserv("After ReadFromImage")
+    from blocks in CutQr(qrCode)
+    from _2 in Obeserv("After CutQr")
+    from textOutput in BuildOutput(blocks, before: AddMainTagComment)
+    from _3 in Obeserv("After BuildOutput")
+    select textOutput;
 
-buildResult.Match(
-    HandleSuccess,
-    HandleFail
-);
+buildResult.Match(HandleSuccess, HandleFail);
 
 Console.WriteLine("Press any key to continue");
 Console.Read();
 
-static void HandleSuccess((string text, string html) output)
+static void HandleSuccess(string output)
 {
-    Console.WriteLine($"success: {Environment.NewLine}{output.text}");
-    Console.WriteLine($"success: {Environment.NewLine}{output.html}");
+    Console.WriteLine($"success: {Environment.NewLine}{output}");
 }
 
-static void HandleFail(Exception ex)
+static void HandleFail(Problem ex)
 {
     Console.WriteLine($"error: {ex.Message}");
+}
+
+static Either<Problem, Unit> Obeserv(string message) 
+{
+    Console.WriteLine(message);
+    return Unit.Default; 
 }
