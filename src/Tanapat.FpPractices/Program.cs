@@ -23,9 +23,3 @@ static void HandleFail(Problem ex)
 {
     Console.WriteLine($"error: {ex.Message}");
 }
-
-static Either<Problem, Unit> Obeserv(string message) 
-{
-    Console.WriteLine(message);
-    return Unit.Default; 
-}

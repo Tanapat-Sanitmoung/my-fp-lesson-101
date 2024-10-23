@@ -27,8 +27,6 @@ public sealed class Handler : Endpoint<Request>
             let newQrInfo = new QRInfo(newQrCode, qrInfo.Width, qrInfo.Height)
             from outputStream in QRImage.WriteToStream(newQrInfo)
             let fileName = $"EMV-{DateTime.Now:yyyyMMddHHmmssfff}.jpg"
-            from _1 in Debug($"Original: {qrInfo.QrCode}")
-            from _2 in Debug($"New     : {newQrInfo.QrCode}")
             select (outputStream, fileName);
 
         await result.Match(
@@ -36,11 +34,4 @@ public sealed class Handler : Endpoint<Request>
             p => SendStringAsync(p.Message)
         );
     }
-
-    private Either<Problem, Unit> Debug(string message) 
-    {
-        Console.WriteLine(message);
-        return Unit.Default;
-    }
-
 }
