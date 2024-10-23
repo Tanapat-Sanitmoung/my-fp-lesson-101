@@ -7,6 +7,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{36F2A8E9-225
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tanapat.FpPractices", "src\Tanapat.FpPractices\Tanapat.FpPractices.csproj", "{A924517B-CA69-4DCE-80BF-37C5FBEC6970}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tanapat.FpPractices.WebApi", "src\Tanapat.FpPractices.WebApi\Tanapat.FpPractices.WebApi.csproj", "{4AA8134D-3B7F-4127-94FD-099498AB57BE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,8 +22,13 @@ Global
 		{A924517B-CA69-4DCE-80BF-37C5FBEC6970}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A924517B-CA69-4DCE-80BF-37C5FBEC6970}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A924517B-CA69-4DCE-80BF-37C5FBEC6970}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4AA8134D-3B7F-4127-94FD-099498AB57BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AA8134D-3B7F-4127-94FD-099498AB57BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AA8134D-3B7F-4127-94FD-099498AB57BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AA8134D-3B7F-4127-94FD-099498AB57BE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{A924517B-CA69-4DCE-80BF-37C5FBEC6970} = {36F2A8E9-225B-481C-87FA-263EA834B46A}
+		{4AA8134D-3B7F-4127-94FD-099498AB57BE} = {36F2A8E9-225B-481C-87FA-263EA834B46A}
 	EndGlobalSection
 EndGlobal

@@ -1,0 +1,6 @@
+@Tanapat.FpPractices.WebApi_HostAddress = http://localhost:5028
+
+GET {{Tanapat.FpPractices.WebApi_HostAddress}}/todo/todos
+Accept: application/json
+
+###
