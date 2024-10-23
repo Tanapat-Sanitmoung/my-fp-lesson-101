@@ -2,7 +2,6 @@ using System.Text;
 using LanguageExt;
 using SkiaSharp;
 using ZXing.SkiaSharp;
-using static LanguageExt.Prelude;
 
 namespace Tanapat.FpPractices.Features;
 
