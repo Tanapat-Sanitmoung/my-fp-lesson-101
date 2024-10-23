@@ -1,5 +1,4 @@
 using FastEndpoints;
-using LanguageExt;
 
 namespace Tanapat.FpPractices.WebApi.Features.EmvQr.ChangeTxnAmount;
 

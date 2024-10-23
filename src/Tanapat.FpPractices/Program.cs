@@ -1,5 +1,4 @@
-﻿using LanguageExt;
-using Tanapat.FpPractices.Features;
+﻿using Tanapat.FpPractices.Features;
 using static Tanapat.FpPractices.Features.EMVQR;
 
 var buildResult = 
