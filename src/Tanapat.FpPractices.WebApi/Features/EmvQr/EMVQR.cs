@@ -67,8 +67,13 @@ public static class EMVQR
 
             if (recalculateCRC)
             {
-                var qrWithNoCrcValue = builder.ToString(0, builder.Length - 4);
+                // remove old CRC value
+                builder.Remove(builder.Length - 4, 4);
+                
+                var qrWithNoCrcValue = builder.ToString();
+
                 var crc = EmvCrcCalculator.ComputeChecksum(qrWithNoCrcValue);
+                
                 builder.Append(crc);
             }
             
