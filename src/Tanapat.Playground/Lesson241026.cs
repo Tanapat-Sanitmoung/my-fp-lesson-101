@@ -11,7 +11,7 @@ public static class Lesson241026
         Console.WriteLine(" Solution 1");
         var result =
             from dir in GetFolders("D:\\folder1", "D:\\folder2")
-            from f in GetFiles(dir, Seq("*.jpg", "*.png"))
+            from f in GetFiles(dir, SearchPatterns("*.jpg", "*.png"))
             from c in GetContent(f)
             select c;
 
@@ -22,7 +22,7 @@ public static class Lesson241026
 
         Console.WriteLine(" Solution 2");
         var result2 = GetFolders("D:\\folder1", "D:\\folder2")
-            .SelectMany(dir => GetFiles(dir, Seq("*.jpg", "*.png")))
+            .SelectMany(dir => GetFiles(dir, SearchPatterns("*.jpg", "*.png")))
             .SelectMany(f => GetContent(f))
             .ToSeq()
             .Iter(c => Console.WriteLine("Content := {0}", c));
@@ -35,20 +35,24 @@ public record FileName(string Value);
 
 public record Folder(string Value);
 
+public record FileContent(string Value);
+
+public record SearchPattern(string Value);
+
 public static class Lesson241026_Methods
 {
-    public static Seq<FileName> GetFiles(Folder dir, string searchPattern)
+    public static Seq<FileName> GetFiles(Folder dir, SearchPattern searchPattern)
         => Mock(dir, searchPattern)
             .Map(d => new FileName(d))
             .ToSeq();
 
-    public static Seq<FileName> GetFiles(Folder dir, Seq<string> searchPattern)
+    public static Seq<FileName> GetFiles(Folder dir, Seq<SearchPattern> searchPattern)
         => from p in searchPattern
            from f in GetFiles(dir, p)
            select f;
 
-    public static Seq<string> Mock(Folder dir, string searchPattern)
-        => (dir.Value, searchPattern) switch
+    private static Seq<string> Mock(Folder dir, SearchPattern searchPattern)
+        => (dir.Value, searchPattern.Value) switch
         {
             (var d, "*.jpg") when d == "D:\\folder1" => Seq([$"{d}\\f1.jpg", $"{d}\\f2.jpg"]),
             (var d, "*.jpg") when d == "D:\\folder2" => Seq([$"{d}\\f3.jpg", $"{d}\\f4.jpg"]),
@@ -58,7 +62,15 @@ public static class Lesson241026_Methods
         };
 
     public static Seq<Folder> GetFolders(params string[] folderNames)
-        => folderNames.Map(f => new Folder(f)).ToSeq();
+        => folderNames
+            .Map(f => new Folder(f))
+            .ToSeq();
+
+
+    public static Seq<SearchPattern> SearchPatterns(params string[] searchPattern)
+        => searchPattern
+            .Map(p => new SearchPattern(p))
+            .ToSeq();
 
     
     public static Option<string> GetContent(FileName name)
