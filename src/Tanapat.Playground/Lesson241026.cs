@@ -1,5 +1,3 @@
-using LanguageExt;
-using static LanguageExt.Prelude;
 using static Tanapat.Playground.Lesson241026_Methods;
 
 namespace Tanapat.Playground;

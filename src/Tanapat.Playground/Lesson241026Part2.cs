@@ -1,8 +1,3 @@
-
-using System.Reflection.Metadata.Ecma335;
-using LanguageExt;
-using static LanguageExt.Prelude;
-
 namespace Tanapat.Playground;
 
 public static class Lesson241026Part2
