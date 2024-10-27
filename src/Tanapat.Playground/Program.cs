@@ -1,6 +1,4 @@
-﻿
-using Tanapat.Playground;
+﻿using Tanapat.Playground;
 
-// Lesson241026.Execute();
-
-Lesson241026Part2.Execute();
+Lesson241027.Execute();
+Lesson241027Candidate.Execute();
