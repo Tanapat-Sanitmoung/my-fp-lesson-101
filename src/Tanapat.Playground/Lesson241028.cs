@@ -30,16 +30,25 @@ public static class Lesson241028
  
         // Usage Design 
         Read(rawString)
-            .Map(s => Upsert(s.Blocks, "53", "768"))
-            .Map(s => Upsert(s.Blocks, "54", "123.23"))
-            .Map(s => Upsert(s.Blocks, "99", "123.23"))
-            .Map(s => CalCrc(s.Blocks))
-            .Map(s => s.Blocks.Iter(b => Console.WriteLine($"{b.Tag.Text} {b.Value}")))
-            .IfLeft(u => Console.WriteLine(u.Remainder));
-
+            .Bind(s => Upsert(s, "53", "768"))
+            .Bind(s => Upsert(s, "54", "123.23"))
+            .Bind(s => Upsert(s, "99", "123.23"))
+            .Bind(s => CalCrc(s))
+            .Bind(s => PrintBlocks(s))
+            .MapLeft(p => PrintProblem(p));
     }
 
-    static Either<ReadErrorResult, ReadResult> Read(string source)
+    record Problem(string Message);
+
+    static Either<Problem, Unit> PrintBlocks(Seq<Block> blocks)
+        => blocks.Iter(b => Console.WriteLine($"{b.Tag.Text} {b.Value}"));
+
+    static Unit PrintProblem(Problem p)
+    { 
+        Console.WriteLine(p.Message); return Unit.Default; 
+    }
+
+    static Either<Problem, Seq<Block>> Read(string source)
     {
         var blockList = new List<Block>();
 
@@ -66,26 +75,34 @@ public static class Lesson241028
             return (idx + valLen, source.Substring(idx, valLen));
         };
 
+        Func<int, (int, string ,string)> ReadBLock = (idx) => 
+        {
+            (idx, var tag) = ReadId(idx);
+            (idx, var value) = ReadValue(idx);
+
+            return (idx, tag, value);
+        };
+
         try
         {
             while (NotEnd(index))
             {
-                (index, var tag) = ReadId(index);
-                (index, var value) = ReadValue(index);
+                (index, var tag, var value) = ReadBLock(index);
+                
                 blockList.Add(new Block(tag, value));
 
             } //while 
 
-            return new ReadResult(blockList.ToSeq());
+            return blockList.ToSeq();
         }
         catch  (Exception ex)
         {
-            return new ReadErrorResult(blockList.ToSeq(), source.Substring(index), ex);
+            return new Problem(ex.Message);
         }
 
     }
 
-    static UpsertResult Upsert(Seq<Block> blocks, string targetTag, string value)
+    static Either<Problem, Seq<Block>> Upsert(Seq<Block> blocks, string targetTag, string value)
     {
         var output = blocks.ToList();
         
@@ -112,10 +129,10 @@ public static class Lesson241028
             }
         }
 
-        return new UpsertResult(output.ToSeq());
+        return output.ToSeq();
     }
 
-    static CalCrcResult CalCrc(Seq<Block> blocks)
+    static Either<Problem, Seq<Block>> CalCrc(Seq<Block> blocks)
     {
         var sb = new StringBuilder();
 
@@ -137,7 +154,7 @@ public static class Lesson241028
             }
         }        
 
-        return new CalCrcResult(output.ToSeq());
+        return output.ToSeq();
     }
 
     record ReadResult(Seq<Block> Blocks);
@@ -196,10 +213,7 @@ public static class Lesson241028
         {
 
         }
-    }
-
-    public static TDest Map<TSrc, TDest>(this TSrc @this, Func<TSrc, TDest> f) => f(@this);    
-
+    } 
 
     public sealed class EmvCrcCalculator
     {
@@ -237,10 +251,4 @@ public static class Lesson241028
             return crc.ToString("X4");
         }
     }
-}
-
-public static class FuncExtensions
-{
-    public static Func<TA, TC> Apply<TA, TB, TC>(this Func<TA, TB> func1, Func<TB, TC> func2)
-        => (a) => func2(func1(a));
 }
