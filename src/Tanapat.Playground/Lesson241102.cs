@@ -38,7 +38,8 @@ public static class Lesson241102
                     output.Add(new(str1, str3));
                 }
 
-                throw new Exception("Test");
+                // throw new Exception("Test");
+
                 return output.ToSeq();
             }
             catch (Exception ex)
