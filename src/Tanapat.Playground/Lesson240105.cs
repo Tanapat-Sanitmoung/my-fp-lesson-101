@@ -9,7 +9,6 @@ public class Lesson241105
         var rawString = "xx02020102111501A6001B63045567";
 
         BlockReader.Read(rawString, (id, value) => new Block(id, value))
-            .Bind(blocks => Try(() => blocks))
             .Match(
                 Succ: s => s.Iter(b => Console.WriteLine($"{b.Id} {b.Value}")),
                 Fail: ex => Console.WriteLine("Problem : {0}", ex.Message)
@@ -25,7 +24,7 @@ public class Lesson241105
 
         private readonly string _1 = s_IdTable.Contains(Id) 
             ? Id 
-            : throw new ArgumentException("Possible values are 00 to 99", nameof(Id));
+            : throw new ArgumentException($"Possible values are 00 to 99 but found [{Id}]", nameof(Id));
 
         private readonly string _2 = Value ?? throw new ArgumentNullException(nameof(Value));
     }
