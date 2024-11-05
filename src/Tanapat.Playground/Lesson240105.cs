@@ -1,23 +1,40 @@
+using System.Collections;
+
 namespace Tanapat.Playground;
 
 public class Lesson241105
 {
     public static void Execute()
     {
-        var rawString = "0002020102111501A6001B63045567";
+        var rawString = "xx02020102111501A6001B63045567";
 
-        new BlockReader()
-            .Read(rawString, (id, value) => new Block(id, value))
+        BlockReader.Read(rawString, (id, value) => new Block(id, value))
+            .Bind(blocks => Try(() => blocks))
             .Match(
                 Succ: s => s.Iter(b => Console.WriteLine($"{b.Id} {b.Value}")),
                 Fail: ex => Console.WriteLine("Problem : {0}", ex.Message)
             );
     }
 
-    record Block(string Id, string Value);
+    record Block(string Id, string Value)
+    {
+        private static System.Collections.Generic.HashSet<string> s_IdTable = 
+            Enumerable.Range(start: 0, count:100)
+                .Select(v => v.ToString("D2"))
+                .ToHashSet();
+
+        private readonly string _1 = s_IdTable.Contains(Id) 
+            ? Id 
+            : throw new ArgumentException("Possible values are 00 to 99", nameof(Id));
+
+        private readonly string _2 = Value ?? throw new ArgumentNullException(nameof(Value));
+    }
 
     class BlockReader 
     {
+        public static Try<Seq<T>> Read<T>(string source, Func<string, string, T> convertor)
+            => new BlockReader().InstanceRead(source, convertor);
+
         private int _index;
         private string _source = string.Empty;
 
@@ -40,9 +57,11 @@ public class Lesson241105
             => _index < _source.Length;
 
         private void Init(string source)
-            => (_source, _index) = (source, 0) ;
+            => (_source, _index) = (source, 0);
 
-        public Try<Seq<T>> Read<T>(string source, Func<string, string, T> convertor)
+        private BlockReader() {}
+
+        private Try<Seq<T>> InstanceRead<T>(string source, Func<string, string, T> convertor)
             => Try(() => 
             {
                 Init(source);
