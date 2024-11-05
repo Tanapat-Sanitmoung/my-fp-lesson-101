@@ -33,8 +33,8 @@ public class Lesson241105
         private string ReadValue()
             => Read(ReadValueLen());
 
-        private (string Id, string Value) ReadBlock()
-            => (ReadId(), ReadValue());
+        private T ReadBlock<T>(Func<string, string, T> createBlock)
+            => createBlock(ReadId(), ReadValue());
 
         private bool NotEnd()
             => _index < _source.Length;
@@ -42,7 +42,7 @@ public class Lesson241105
         private void Init(string source)
             => (_source, _index) = (source, 0) ;
 
-        public Try<Seq<T>> Read<T>(string source, Func<string, string, T> convert)
+        public Try<Seq<T>> Read<T>(string source, Func<string, string, T> convertor)
             => Try(() => 
             {
                 Init(source);
@@ -51,8 +51,7 @@ public class Lesson241105
 
                 while (NotEnd())
                 {
-                    var (id, value) = ReadBlock();
-                    appender.Add(convert(id, value));
+                    appender.Add(ReadBlock(convertor));
                 }
 
                 return appender.ToSeq();
