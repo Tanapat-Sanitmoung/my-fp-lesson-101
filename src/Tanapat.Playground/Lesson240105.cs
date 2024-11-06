@@ -8,13 +8,19 @@ public class Lesson241105
     {
         var rawString = "0002020102111501A6001B6304D546";
 
-        BlockReader.Read(rawString, (id, value) => new Block(id, value))
+        BlockReader.Read(rawString)
             .Bind(BlocksValidator.Validate)
             .Match(
-                Succ: s => s.Blocks.Iter(b => Console.WriteLine($"{b.Id} {b.Value}")),
-                Fail: ex => Console.WriteLine("Problem : {0}", ex.Message)
+                Succ: HandleSuccess,
+                Fail: HandleFail
             );
     }
+
+    static void HandleSuccess(ValidBlocks validBlocks)
+        => validBlocks.Blocks.Iter(b => Console.WriteLine($"{b.Id} {b.Value}"));
+
+    static void HandleFail(Exception ex)
+         => Console.WriteLine("Problem : {0}", ex.Message);
 
     record Block(string Id, string Value)
     {
@@ -27,6 +33,8 @@ public class Lesson241105
             ? Id 
             : throw new ArgumentException($"Possible values are 00 to 99 but found [{Id}]", nameof(Id));
     }
+
+    record RawBlocks(Seq<Block> Blocks);
 
     record ValidBlocks(Seq<Block> Blocks);
 
@@ -56,15 +64,15 @@ public class Lesson241105
         private static string CalculateCrc(Seq<Block> blocks)
             => EmvCrcCalculator.ComputeChecksum(dataWithoutCrcValue: GetStringForCrc(blocks));
 
-        public static Try<ValidBlocks> Validate(Seq<Block> blocks)
+        public static Try<ValidBlocks> Validate(RawBlocks rawBlock)
         {
             return Try(() => 
             {
-                var calculatedCrc = CalculateCrc(blocks);
-                var sourceCrc = blocks.Last().Value;
+                var calculatedCrc = CalculateCrc(rawBlock.Blocks);
+                var sourceCrc = rawBlock.Blocks.Last().Value;
                
                 return sourceCrc == calculatedCrc 
-                        ? new ValidBlocks(blocks)
+                        ? new ValidBlocks(rawBlock.Blocks)
                         : throw new Exception($"Invalid CRC [Src:={sourceCrc}, Calculated:={calculatedCrc}]");
                 
             });
@@ -73,8 +81,9 @@ public class Lesson241105
 
     class BlockReader 
     {
-        public static Try<Seq<T>> Read<T>(string source, Func<string, string, T> convertor)
-            => new BlockReader().InstanceRead(source, convertor);
+        public static Try<RawBlocks> Read(string source)
+            => new BlockReader()
+                .InstanceRead(source);
 
         private int _index;
         private string _source = string.Empty;
@@ -91,8 +100,8 @@ public class Lesson241105
         private string ReadValue()
             => Read(ReadValueLen());
 
-        private T ReadBlock<T>(Func<string, string, T> createBlock)
-            => createBlock(ReadId(), ReadValue());
+        private Block ReadBlock()
+            => new(ReadId(), ReadValue());
 
         private bool NotEnd()
             => _index < _source.Length;
@@ -102,19 +111,19 @@ public class Lesson241105
 
         private BlockReader() {}
 
-        private Try<Seq<T>> InstanceRead<T>(string source, Func<string, string, T> convertor)
+        private Try<RawBlocks> InstanceRead(string source)
             => Try(() => 
             {
                 Init(source);
 
-                var appender = new List<T>();
+                var appender = new List<Block>();
 
                 while (NotEnd())
                 {
-                    appender.Add(ReadBlock(convertor));
+                    appender.Add(ReadBlock());
                 }
 
-                return appender.ToSeq();
+                return new RawBlocks(appender.ToSeq());
             });
     }
 
