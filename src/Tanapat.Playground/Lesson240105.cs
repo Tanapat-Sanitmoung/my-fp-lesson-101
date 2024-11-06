@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Text;
+using LanguageExt.UnitsOfMeasure;
 
 namespace Tanapat.Playground;
 
@@ -6,18 +8,19 @@ public class Lesson241105
 {
     public static void Execute()
     {
-        var rawString = "xx02020102111501A6001B63045567";
+        var rawString = "0002020102111501A6001B63045567";
 
         BlockReader.Read(rawString, (id, value) => new Block(id, value))
+            .Bind(BlocksValidator.Validate)
             .Match(
-                Succ: s => s.Iter(b => Console.WriteLine($"{b.Id} {b.Value}")),
+                Succ: s => s.Blocks.Iter(b => Console.WriteLine($"{b.Id} {b.Value}")),
                 Fail: ex => Console.WriteLine("Problem : {0}", ex.Message)
             );
     }
 
     record Block(string Id, string Value)
     {
-        private static System.Collections.Generic.HashSet<string> s_IdTable = 
+        private static readonly System.Collections.Generic.HashSet<string> s_IdTable = 
             Enumerable.Range(start: 0, count:100)
                 .Select(v => v.ToString("D2"))
                 .ToHashSet();
@@ -25,8 +28,49 @@ public class Lesson241105
         private readonly string _1 = s_IdTable.Contains(Id) 
             ? Id 
             : throw new ArgumentException($"Possible values are 00 to 99 but found [{Id}]", nameof(Id));
+    }
 
-        private readonly string _2 = Value ?? throw new ArgumentNullException(nameof(Value));
+    record ValidBlocks(Seq<Block> Blocks);
+
+    class BlocksValidator
+    {
+        private static string GetStringForCrc(Seq<Block> blocks)
+            => blocks.Fold(
+                state: InitAppender(),
+                f: AppendBlockString
+            ).ToString();
+
+        private static StringBuilder InitAppender() => new();
+
+        private static StringBuilder AppendBlockString(StringBuilder appender, Block block)
+            =>  appender.Append(BlocksToString(block));
+
+        private static string BlocksToString(Block block)
+            => block.Id switch {
+                "63" => BlockToStringWithNoValue(block),
+                _ => BlockToStringFull(block),
+            };
+
+        private static string BlockToStringFull(Block b) => $"{b.Id}{b.Value.Length:D2}{b.Value}";
+
+        private static string BlockToStringWithNoValue(Block b) => $"{b.Id}{b.Value.Length:D2}";
+
+        private static string CalculateCrc(Seq<Block> blocks)
+            => EmvCrcCalculator.ComputeChecksum(dataWithoutCrcValue: GetStringForCrc(blocks));
+
+        public static Try<ValidBlocks> Validate(Seq<Block> blocks)
+        {
+            return Try(() => 
+            {
+                var calculatedCrc = CalculateCrc(blocks);
+                var sourceCrc = blocks.Last().Value;
+               
+                return sourceCrc == calculatedCrc 
+                        ? new ValidBlocks(blocks)
+                        : throw new Exception($"Invalid CRC [Src:={sourceCrc}, Calculated:={calculatedCrc}]");
+                
+            });
+        }
     }
 
     class BlockReader 
@@ -74,5 +118,43 @@ public class Lesson241105
 
                 return appender.ToSeq();
             });
+    }
+
+    public sealed class EmvCrcCalculator
+    {
+        private static readonly ushort[] s_table = InitializeTable();
+        private static ushort[] InitializeTable()
+        {
+            var table = new ushort[256];
+
+            const ushort Polynomial = 0x1021;
+            ushort temp, a;
+            for (var i = 0; i < table.Length; i++)
+            {
+                temp = 0;
+                a = (ushort)(i << 8);
+                for (var j = 0; j < 8; j++)
+                {
+                    if (((temp ^ a) & 0x8000) != 0)
+                        temp = (ushort)((temp << 1) ^ Polynomial);
+                    else
+                        temp <<= 1;
+                    a <<= 1;
+                }
+                table[i] = temp;
+            }
+            return table;
+        }
+
+        public static string ComputeChecksum(string dataWithoutCrcValue)
+        {
+            ushort crc = 0xffff;
+            var bytes = Encoding.UTF8.GetBytes(dataWithoutCrcValue);
+            for (var i = 0; i < bytes.Length; i++)
+            {
+                crc = (ushort)((crc << 8) ^ s_table[(crc >> 8) ^ (0xff & bytes[i])]);
+            }
+            return crc.ToString("X4");
+        }
     }
 }
