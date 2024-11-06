@@ -6,7 +6,7 @@ public class Lesson241105
 {
     public static void Execute()
     {
-        var rawString = "0002020102111501A6001B63045567";
+        var rawString = "0002020102111501A6001B6304D546";
 
         BlockReader.Read(rawString, (id, value) => new Block(id, value))
             .Bind(BlocksValidator.Validate)
