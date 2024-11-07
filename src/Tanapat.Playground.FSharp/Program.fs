@@ -5,11 +5,9 @@ type Block = { Id: string; Value: string }
 let rec readBlock (input: string) (index: int) (accumulator: Block list) = 
     if index < input.Length then
         let id = input.Substring(index, 2)
-        let index = index + 2
-        let len = input.Substring(index, 2) |> int
-        let index = index + 2
-        let value = input.Substring(index, len)
-        let index = index + len
+        let len = input.Substring(index + 2, 2) |> int
+        let value = input.Substring(index + 4, len)
+        let index = index + 4 + len
         readBlock input index ({ Id = id; Value = value } :: accumulator)
     else
         List.rev accumulator
