@@ -5,11 +5,11 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": ".NET Core Launch (console)",
+            "name": "F# Playground",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/bin/Debug/<target-framework>/<project-name.dll>",
+            "program": "${workspaceFolder}/src/Tanapat.Playground.FSharp/Tanapat.Playground.FSharp.fsproj",
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
