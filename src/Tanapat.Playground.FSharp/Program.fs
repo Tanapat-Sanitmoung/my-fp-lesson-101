@@ -31,13 +31,13 @@ module CRC =
         output 
     )
 
-let computeCrc (data:string) :string=
-    let mutable crc = 0xffffus
-    let removedCrcValue = data.Substring(0, data.Length - 4)
-    let bytes  = Encoding.UTF8.GetBytes(s=removedCrcValue)
-    for b in bytes do
-        crc <- (crc <<< 8) ^^^ CRC.table.Value[int (crc >>> 8) ^^^ int b &&& 0xff]
-    crc.ToString("X4")
+    let compute (data:string) :string=
+        let mutable crc = 0xffffus
+        let removedCrcValue = data.Substring(0, data.Length - 4)
+        let bytes  = Encoding.UTF8.GetBytes(s=removedCrcValue)
+        for b in bytes do
+            crc <- (crc <<< 8) ^^^ table.Value[int (crc >>> 8) ^^^ int b &&& 0xff]
+        crc.ToString("X4")
 
 let printBlocks (blocks: Block list) :unit =
     blocks
@@ -48,7 +48,7 @@ let main argv =
 
     let qr = "0002020102113010123456789A5303718540310063041234"
 
-    computeCrc qr
+    CRC.compute qr
     |> printfn "CRC = %s"
 
     readBlock qr 0 []
