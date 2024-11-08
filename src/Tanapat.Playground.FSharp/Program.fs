@@ -1,6 +1,5 @@
 ﻿module HelloSquare
 
-open System
 open System.Text
 
 type Block = { Id: string; Value: string }
@@ -15,27 +14,29 @@ let rec readBlock (input: string) (index: int) (accumulator: Block list) =
     else
         List.rev accumulator
 
-let table = Array.zeroCreate<uint16> 256
-
-let initializeCrcTable =
-    let poly = 0x1021us
-    for i in 0 .. table.Length - 1 do
-        let mutable temp = 0us
-        let mutable a = uint16 (i <<< 8)
-        for _ in 0 .. 7 do
-            if (temp ^^^ a) &&& 0x8000us <> 0us then
-                temp <- (temp <<< 1) ^^^ poly
-            else
-                temp <- temp <<< 1
-            a <- a <<< 1
-        table[i] <- temp
+module CRC = 
+    let table = lazy (
+        let output = Array.zeroCreate<uint16> 256
+        let poly = 0x1021us
+        for i in 0 .. output.Length - 1 do
+            let mutable temp = 0us
+            let mutable a = uint16 (i <<< 8)
+            for _ in 0 .. 7 do
+                if (temp ^^^ a) &&& 0x8000us <> 0us then
+                    temp <- (temp <<< 1) ^^^ poly
+                else
+                    temp <- temp <<< 1
+                a <- a <<< 1
+            output[i] <- temp
+        output 
+    )
 
 let computeCrc (data:string) :string=
     let mutable crc = 0xffffus
     let removedCrcValue = data.Substring(0, data.Length - 4)
     let bytes  = Encoding.UTF8.GetBytes(s=removedCrcValue)
     for b in bytes do
-        crc <- (crc <<< 8) ^^^ table[int (crc >>> 8) ^^^ int b &&& 0xff]
+        crc <- (crc <<< 8) ^^^ CRC.table.Value[int (crc >>> 8) ^^^ int b &&& 0xff]
     crc.ToString("X4")
 
 let printBlocks (blocks: Block list) :unit =
@@ -44,7 +45,6 @@ let printBlocks (blocks: Block list) :unit =
 
 [<EntryPoint>]
 let main argv =
-    initializeCrcTable 
 
     let qr = "0002020102113010123456789A5303718540310063041234"
 
@@ -53,5 +53,5 @@ let main argv =
 
     readBlock qr 0 []
     |> printBlocks
-    
+
     0 // Return an integer exit code
