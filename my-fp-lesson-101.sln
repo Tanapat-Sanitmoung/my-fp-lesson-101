@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tanapat.FpPractices.WebApi"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tanapat.Playground", "src\Tanapat.Playground\Tanapat.Playground.csproj", "{A6571C28-0E4D-4CA8-80B2-CD05D5A08767}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Tanapat.Playground.FSharp", "src\Tanapat.Playground.FSharp\Tanapat.Playground.FSharp.fsproj", "{8787217C-6BDD-4BF5-8C9E-D5830A328560}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,10 +34,15 @@ Global
 		{A6571C28-0E4D-4CA8-80B2-CD05D5A08767}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6571C28-0E4D-4CA8-80B2-CD05D5A08767}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A6571C28-0E4D-4CA8-80B2-CD05D5A08767}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8787217C-6BDD-4BF5-8C9E-D5830A328560}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8787217C-6BDD-4BF5-8C9E-D5830A328560}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8787217C-6BDD-4BF5-8C9E-D5830A328560}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8787217C-6BDD-4BF5-8C9E-D5830A328560}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{A924517B-CA69-4DCE-80BF-37C5FBEC6970} = {36F2A8E9-225B-481C-87FA-263EA834B46A}
 		{4AA8134D-3B7F-4127-94FD-099498AB57BE} = {36F2A8E9-225B-481C-87FA-263EA834B46A}
 		{A6571C28-0E4D-4CA8-80B2-CD05D5A08767} = {36F2A8E9-225B-481C-87FA-263EA834B46A}
+		{8787217C-6BDD-4BF5-8C9E-D5830A328560} = {36F2A8E9-225B-481C-87FA-263EA834B46A}
 	EndGlobalSection
 EndGlobal
