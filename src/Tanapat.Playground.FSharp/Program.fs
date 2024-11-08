@@ -4,16 +4,6 @@ open System.Text
 
 type Block = { Id: string; Value: string }
 
-let rec readBlock (input: string) (index: int) (accumulator: Block list) = 
-    if index < input.Length then
-        let id = input.Substring(index, 2)
-        let len = input.Substring(index + 2, 2) |> int
-        let value = input.Substring(index + 4, len)
-        let index = index + 4 + len
-        readBlock input index ({ Id = id; Value = value } :: accumulator)
-    else
-        List.rev accumulator
-
 module CRC = 
     let table = lazy (
         let output = Array.zeroCreate<uint16> 256
@@ -39,19 +29,56 @@ module CRC =
             crc <- (crc <<< 8) ^^^ table.Value[int (crc >>> 8) ^^^ int b &&& 0xff]
         crc.ToString("X4")
 
-let printBlocks (blocks: Block list) :unit =
-    blocks
-    |> List.iter (fun b -> printfn "id: %s, value: %s" b.Id b.Value)
+//rec = recursive
+// :: operator is concat list
+let rec readBlocks (input: string) (index: int) (accumulator: Block list) = 
+    if index < input.Length then
+        let id = input.Substring(index, 2)
+        let len = input.Substring(index + 2, 2) |> int
+        let value = input.Substring(index + 4, len)
+        let index = index + 4 + len
+        readBlocks input index ({ Id = id; Value = value } :: accumulator)
+    else
+        List.rev accumulator
+
+let printOutput (content:string) :string =
+    content
+    |> printfn "%s"
+    content
+
+open System.IO
+
+let writeOutput content =
+    task {
+        use file = File.Create("test.log")
+        let data = System.Text.Encoding.UTF8.GetBytes(s=content)
+        do! file.WriteAsync data
+    }
+
+let buildOutput blocks =
+    let sb = new StringBuilder()
+    blocks 
+    |> List.iter (
+        fun b -> 
+            sb.AppendLine($"ID: {b.Id}, Value: {b.Value}") 
+            |> ignore
+        )
+    sb.ToString()
 
 [<EntryPoint>]
 let main argv =
 
     let qr = "0002020102113010123456789A5303718540310063041234"
 
-    CRC.compute qr
-    |> printfn "CRC = %s"
+    qr
+    |> CRC.compute 
+    |> printfn "calculate CRC = %s"
 
-    readBlock qr 0 []
-    |> printBlocks
+    readBlocks qr 0 []
+    |> buildOutput 
+    |> printOutput
+    |> writeOutput 
+    |> Async.AwaitTask
+    |> Async.RunSynchronously
 
     0 // Return an integer exit code
