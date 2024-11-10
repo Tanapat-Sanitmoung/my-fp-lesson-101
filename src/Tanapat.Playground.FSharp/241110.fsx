@@ -58,3 +58,54 @@ let copyFam =
 
 printfn "fam = %A" fam
 printfn "copy fam = %A" copyFam
+
+let days includeWeekend = 
+    seq {
+        "MON"
+        "TUE"
+        "WED"
+        "THU"
+        "FRI"
+        if includeWeekend then
+            "SAT"
+            "SUN"
+    }
+
+days true
+|> Seq.iter (fun s -> printfn "%s" s)
+
+let classifyAge a =
+    match a with
+    | con1 when con1 < 18 -> "Not adult"
+    | _ -> "Adult"
+
+let age = 15
+age
+|> classifyAge
+|> printfn "%s"
+
+let (|Even|Odd|) x = if x % 2 = 0 then Even else Odd
+
+let TestNumber input =
+   match input with
+   | Even -> printfn "%d is even" input
+   | Odd -> printfn "%d is odd" input
+
+TestNumber 7
+TestNumber 11
+TestNumber 32
+
+let isAdult a = a > 17
+
+let (|Adult|_|) x 
+    = if isAdult x then Some(Adult) else None
+
+let testRate x =
+    match x with
+    | Adult a ->  printfn "%d Adult rating" x
+    | _ -> printfn "%d Not adult" x
+
+[10;18;30;12] |> List.map testRate
+
+// this amaze me : https://learn.microsoft.com/en-us/dotnet/fsharp/language-reference/active-patterns
+
