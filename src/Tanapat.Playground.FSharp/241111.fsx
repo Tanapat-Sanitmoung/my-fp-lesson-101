@@ -39,3 +39,17 @@ with
 
 // Note to myself:
 // sprintf is used to format string and return value without display in console
+
+let months = 
+    [|"JAN";"FEB";"MAR";"APR";"MAY";"JUN";"JUL";"AUG";"SEP";"OCT";"NOV";"DEC"|]
+
+let (|IsMonth|_|) (num:int) =
+    if num >= 1 && num <= 12 then Some(months[num-1]) else None
+
+let selectMonthNum num =
+    match num with
+    | IsMonth m -> m
+    | _ -> sprintf "Invalid month [%d]" num
+
+selectMonthNum 10
+|> printfn "you have selected month: %s"  
