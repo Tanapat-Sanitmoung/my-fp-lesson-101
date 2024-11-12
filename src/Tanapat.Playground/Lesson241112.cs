@@ -81,6 +81,19 @@ public static class UseCase
         // ==========
     }
 
+    public static void JustCurious1()
+    {
+        var list1 = new List<int>();
+
+        var result = list1 switch 
+        {
+            [] => "Empty lisst",
+            [1, _, 5] => "Has 3 element, start with 1 and end with 5",
+            [1, .., 3] => "Start with 1 and end with 3",
+            _ => "I don't care"
+        };
+    }
+
     static CustomerProfile GetCustomerProfile(string customerId)
     {
         // Simulate fetching a customer profile
