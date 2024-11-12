@@ -44,12 +44,41 @@ public static class UseCase
 
         results.ForEach(Console.WriteLine);
 
+        // ==========
+
         var v2Results = from customerId in customerIds 
             let profile = GetCustomerProfile(customerId) 
-            let lowRiskProfile = GetLowRiskCustomerProfile(profile) 
-            select ProcessCustomerProfile(lowRiskProfile); 
+            let lowRiskProfile1 = GetLowRiskCustomerProfile(profile) 
+            select ProcessCustomerProfile(lowRiskProfile1); 
 
         v2Results.ToList().ForEach(Console.WriteLine);
+
+        // ==========
+
+        var v3Results = from customerId in customerIds 
+            let profile = GetCustomerProfile(customerId) 
+            let lowRiskProfile1 = GetLowRiskCustomerProfile(profile) 
+            let lowRiskProfile2 = GetLowRiskCustomerProfile(profile) 
+            let lowRiskProfile3 = GetLowRiskCustomerProfile(profile) 
+            select ProcessCustomerProfile(lowRiskProfile1); 
+
+        v3Results.ToList().ForEach(Console.WriteLine);
+
+        // ==========
+
+        // I REALLY LIKE THIS ONE !!!
+
+        var v4Results = customerIds
+            .Select(customerId => new { customerId, profile = GetCustomerProfile(customerId) })
+            .Select(x => new { x.profile, lowRiskProfile1 = GetLowRiskCustomerProfile(x.profile) })
+            .Select(x => new { x.profile, x.lowRiskProfile1, lowRiskProfile2 = GetLowRiskCustomerProfile(x.profile) })
+            .Select(x => new { x.profile, x.lowRiskProfile1, x.lowRiskProfile2, lowRiskProfile3 = GetLowRiskCustomerProfile(x.profile) })
+            .Select(x => ProcessCustomerProfile(x.lowRiskProfile1))
+            .ToList();
+        
+        v4Results.ToList().ForEach(Console.WriteLine);
+
+        // ==========
     }
 
     static CustomerProfile GetCustomerProfile(string customerId)
