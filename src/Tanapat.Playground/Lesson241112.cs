@@ -31,6 +31,59 @@ public static class UseCase
             };
     }
 
+    public static void UseCase2()
+    {
+        // Thank to co-pilot : https://copilot.microsoft.com/chats/
+        var customerIds = new List<string> { "customer1", "customer2", "customer3" };
+
+        var results = customerIds
+            .Select(GetCustomerProfile)
+            .Select(GetLowRiskCustomerProfile)
+            .Select(ProcessCustomerProfile)
+            .ToList();
+
+        results.ForEach(Console.WriteLine);
+
+        var v2Results = from customerId in customerIds 
+            let profile = GetCustomerProfile(customerId) 
+            let lowRiskProfile = GetLowRiskCustomerProfile(profile) 
+            select ProcessCustomerProfile(lowRiskProfile); 
+
+        v2Results.ToList().ForEach(Console.WriteLine);
+    }
+
+    static CustomerProfile GetCustomerProfile(string customerId)
+    {
+        // Simulate fetching a customer profile
+        return new CustomerProfile { Id = customerId, Name = "Customer Name" };
+    }
+
+    static LowRiskCustomerProfile GetLowRiskCustomerProfile(CustomerProfile profile)
+    {
+        // Simulate processing a low risk customer profile
+        return new LowRiskCustomerProfile { Id = profile.Id, Name = profile.Name, IsLowRisk = true };
+    }
+
+    static string ProcessCustomerProfile(LowRiskCustomerProfile lowRiskProfile)
+    {
+        // Simulate final processing and return success or failure
+        return lowRiskProfile.IsLowRisk ? "Success" : "Failed";
+    }
+    
+
+    class CustomerProfile
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+    }
+
+    class LowRiskCustomerProfile : CustomerProfile
+    {
+        public bool IsLowRisk { get; set; }
+    }
+
+    
+
     public static Unit HandleSuccess() => Unit.Default;
     public static Unit HandleFail() => Unit.Default;
 }
