@@ -42,12 +42,12 @@ public static class Usage
             con => con.SelectAsync<Config>("Select * from table1"));
 
         // More declarative
-        var result3 = GetConfigs(["name", "endpoint", "key"]);
+        var result3 = await GetConfigsAsync(["name", "endpoint", "key"]);
     }
 
     public record Config(string Name, string Value);
 
-    public static Task<Config[]> GetConfigs(string[] names)
+    public static Task<Config[]> GetConfigsAsync(string[] names)
         => ConnectMyDb(
             db => db.SelectAsync<Config>(
                 query: BuildGetConfigQuery(names)));
