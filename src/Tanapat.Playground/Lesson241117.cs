@@ -30,6 +30,21 @@ public static class Practices
         //     WhenHighRisk,
         //     WhenMidRigk,
         //     WhenLowRisk);
+
+        var dict = new Dictionary<int, string>() {
+            [1] = "MON",
+            [2] = "TUE",
+            [3] = "WED",
+            [4] = "THU",
+            [5] = "FRI",
+            [6] = "SAT",
+            [7] = "SUN"
+        };
+
+        dict.Lookup(8)
+            .Match(
+                s => WriteLine($"Hello, {s}"), 
+                () => WriteLine("Hello, ?"));
     }
 
     public static string FillSentence(string fruitName) => $"{fruitName} is fruit";
@@ -81,6 +96,9 @@ public static class X
     //         if (handle(value)(value)) break;
     //     }
     // }
+
+    public static Option<TValue> Lookup<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key)
+        => dict.TryGetValue(key, out var value) ? value : None;
 
 }
 
