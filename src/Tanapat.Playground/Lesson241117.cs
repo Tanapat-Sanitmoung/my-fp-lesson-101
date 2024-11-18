@@ -1,7 +1,7 @@
 using static Tanapat.Playground.Lesson241117.X;
 using static System.Console;
 using System.Diagnostics.Contracts;
-using System.Diagnostics;
+using LanguageExt.SomeHelp;
 
 namespace Tanapat.Playground.Lesson241117;
 
@@ -45,6 +45,23 @@ public static class Practices
             .Match(
                 s => WriteLine($"Hello, {s}"), 
                 () => WriteLine("Hello, ?"));
+
+        var a1 = Age.Of(10);
+
+        a1.Match(
+            (a) => WriteLine($"Age is {a.Value}"),
+            () => WriteLine("None"));
+
+        var a2 = Age.Of(2000);
+
+        a2.Match(
+            (a) => WriteLine($"Age is {a.Value}"),
+            () => WriteLine("None"));
+
+        Risk.OfAge(a1)
+            .IfSome(r => WriteLine($"Your risk is {r.ToSome().Value}"));
+
+        var value = ParseInt("10");
     }
 
     public static string FillSentence(string fruitName) => $"{fruitName} is fruit";
@@ -100,6 +117,11 @@ public static class X
     public static Option<TValue> Lookup<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key)
         => dict.TryGetValue(key, out var value) ? value : None;
 
+    public static bool Between(this int value, int min, int max)
+        => min <= value && value <= max;
+
+    public static Option<int> ParseInt(string t)
+        => int.TryParse(t, out var val) ? Some(val) : None;
 }
 
 public enum Generation
@@ -110,4 +132,40 @@ public enum Generation
     GenY,
     GetZ,
     Children
+}
+
+public readonly record struct Age
+{
+    public int Value { get;}
+
+    private Age(int value) => Value = value;
+
+    public static Option<Age> Of(int value) => IsValid(value) ? new Age(value) : None;
+
+    public static bool IsValid(int value) => value.Between(0, 120);
+
+    public static implicit operator int(Age value) => value.Value;
+
+    public static bool operator <(Age left, Age right) => left.Value < right.Value;
+
+    public static bool operator >(Age left, Age right) => left.Value > right.Value;
+
+    public static bool operator <(Age left, int right) => left.Value < right;
+
+    public static bool operator >(Age left, int right) => left.Value > right;
+}
+
+public enum RiskRanges { Low, Mid, High }
+
+public readonly record struct Risk 
+{
+    public static Option<RiskRanges> OfAge(Option<Age> age)
+        => age.Map(a => CalculateRisk(a));
+    
+    public static RiskRanges CalculateRisk(int age)
+        => age switch {
+             < 10           => RiskRanges.Low,
+            >= 10 and <= 30 => RiskRanges.Mid,
+                          _ => RiskRanges.High
+        };
 }
