@@ -1,3 +1,1 @@
-﻿using Tanapat.Playground;
-
-Lesson241105.Execute();
+﻿Tanapat.Playground.Lesson241120.Practice.Take08();
