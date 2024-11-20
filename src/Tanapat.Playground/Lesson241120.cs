@@ -28,6 +28,20 @@ public static class Practice
         var r2 = f1("0");
     }
 
+    public static void Take03()
+    {
+        WriteLine($"Your age is {ReadAge()}");
+    }
+
+    // recursive call until get correct age
+    public static int ReadAge()
+        => PromptForInput("Please enter your age:")
+            .Bind(ParseInt)
+            .Match(
+                s => s,
+                () =>ReadAge()
+            );
+
     public static Option<string> PromptForInput(string prompt)
     {
         WriteLine(prompt);
