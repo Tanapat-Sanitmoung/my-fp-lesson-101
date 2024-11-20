@@ -1,11 +1,13 @@
 namespace Tanapat.Playground.Lesson241120;
 
+using static Console;
+
 public static class Practice
 {
     public static void Take01()
     {
         // different between Map and Bind
-        
+
         Option<int> a = 1;
         Option<string> b = "Hello,";
     
@@ -15,4 +17,26 @@ public static class Practice
         // not wrapped
         Option<string>         result2 = a.Bind(i => b);
     }
+
+    public static void Take02()
+    {
+        var f1 = (string s) => PromptForInput("Please enter number")
+            .Bind(ParseInt)
+            .Bind(ParseIfNotZero);
+
+        var r1 = f1("1");
+        var r2 = f1("0");
+    }
+
+    public static Option<string> PromptForInput(string prompt)
+    {
+        WriteLine(prompt);
+        return ReadLine() is string inputStr ? inputStr : None;;
+    }
+
+    public static Option<int> ParseInt(string str) 
+        => int.TryParse(str, out var val) ? val : None;
+    
+    public static Option<string> ParseIfNotZero(int val)
+        => val == 0 ? val.ToString() : None;
 }
