@@ -1,3 +1,7 @@
+using LanguageExt;
+using LanguageExt.Common;
+using static LanguageExt.Prelude;
+
 namespace Tanapat.Playground.Lesson241124;
 
 public static class Playing
@@ -37,6 +41,38 @@ public static class Playing
 
         // LastName-Z Middle-Y Tanapat
         // LastName-Z Middle-Y Lawan
+    }
+
+    public static void Play03()
+    {
+        var isAdult = (int a) => a switch {
+            > 19 => Success<Error, int>(a),
+            _ => Fail<Error, int>(Error.New("not adult"))
+        };
+
+        var isOdd = (int a) => (a % 2) switch {
+            0 => Success<Error, int>(a),
+            _ => Fail<Error, int>(Error.New("not odd"))
+        };
+
+        Func<int, Validation<Error, int>>[] validations = [
+            isAdult,
+            isOdd
+        ];
+
+        var age = 11;
+
+        // Harvest errors
+        var result = validations
+            .Fold(
+                state: new List<Validation<Error, int>>(),
+                folder: (acc, validate) => 
+                { 
+                    _ = acc.Append(validate(age)); 
+                    return acc; 
+                }
+            )
+            .Where(v => v.IsFail);
     }
 
 }
