@@ -13,8 +13,8 @@ public static class Example
     // Define a runtime agnostic file copying function
     public static Eff<RT, Unit> CopyFile<RT>(string source, string dest) 
         where RT : struct, HasFile<RT> =>
-            from text in default(RT).FileEff.Map(rt => rt.ReadAllText(source))
-            from _    in default(RT).FileEff.Map(rt => rt.WriteAllText(dest, text))
+            from text in File<RT>.readAllText(source)
+            from _    in File<RT>.writeAllText(dest, text)
             select unit;
 }
 
@@ -46,4 +46,14 @@ public struct LiveFileIO : FileIO
         Console.WriteLine($"{path} >> {text}"); 
         return unit; 
     }
+}
+
+public static class File<RT>
+    where RT : struct, HasFile<RT>
+{
+    public static Eff<RT, string> readAllText(string path) =>
+        default(RT).FileEff.Map(rt => rt.ReadAllText(path));
+
+    public static Eff<RT, Unit> writeAllText(string path, string text) =>
+        default(RT).FileEff.Map(rt => rt.WriteAllText(path, text));
 }
