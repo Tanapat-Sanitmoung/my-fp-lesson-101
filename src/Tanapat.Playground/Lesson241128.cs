@@ -1,4 +1,5 @@
 using LanguageExt;
+using LanguageExt.Common;
 using LanguageExt.SomeHelp;
 using static LanguageExt.Prelude;
 
@@ -13,8 +14,18 @@ public class Program
             from b in MoreThan50(a)
             from _1 in WriteOutput(b)
             select _1;
-            
+
         Console.WriteLine("MainX done");
+
+        var computation2 =
+            from a in Some(199).AsEff()
+            from b in WriteOutputEff(a)
+            select b;
+
+        // Notice that the Eff will not be executed inside query expression
+        computation2.Run(); 
+        
+        Console.WriteLine("MainX done 2");
     }
 
     public static Option<int> MoreThan50(int value) 
@@ -41,4 +52,9 @@ public static class Extensions
                 Succ: u => Some(unit),
                 Fail: _ => None
             );
+    
+    public static Eff<A> AsEff<A>(this Option<A> ma)
+        => ma.Match(
+            a => SuccessEff(a), 
+            () => FailEff<A>(Error.New("None")));
 }
